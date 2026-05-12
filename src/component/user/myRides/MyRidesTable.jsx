@@ -7,16 +7,8 @@ import {
   getPaginationRowModel,
 } from "@tanstack/react-table";
 import {
-  Eye,
-  Download,
-  FileDown,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
-  ChevronLeft,
-  ChevronRight,
-  Hash,
-  MapPin,
+  Eye, Download, FileDown, ArrowUpDown, ArrowUp, ArrowDown,
+  ChevronLeft, ChevronRight, Hash, MapPin,
 } from "lucide-react";
 import moment from "moment";
 import jsPDF from "jspdf";
@@ -27,30 +19,102 @@ const MyRidesTable = ({ rides = [] }) => {
   const [selectedRide, setSelectedRide] = useState(null);
   const [sorting, setSorting] = useState([]);
 
-  const downloadPDF = (data, filename = "Ride_History.pdf") => {
+  // ✅ Professional Receipt PDF
+  const downloadPDF = (data, filename = "Ride_Receipt.pdf") => {
     const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text("VoltRide - Journey Report", 14, 20);
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Generated on: ${moment().format("LLL")}`, 14, 28);
 
-    const tableData = data.map((ride) => [
-      ride._id.slice(-6).toUpperCase(),
-      ride.userId?.name || "N/A",
-      ride.bikeId?.bikeCode || "N/A",
-      `${ride.startStationId?.name || "Start"} to ${ride.endStationId?.name || "Ongoing"}`,
-      `Rs. ${ride.totalCost || 0}`,
-      ride.status.toUpperCase(),
-    ]);
+    data.forEach((ride, index) => {
+      if (index > 0) doc.addPage();
 
-    doc.autoTable({
-      head: [["ID", "Rider", "Bike Code", "Route", "Fare", "Status"]],
-      body: tableData,
-      startY: 35,
-      theme: "striped",
-      headStyles: { fillColor: [15, 23, 42] },
+      // Header Background
+      doc.setFillColor(15, 23, 42); // slate-900
+      doc.rect(0, 0, 210, 40, "F");
+
+      // Logo Text
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(22);
+      doc.setFont("helvetica", "bold");
+      doc.text("VoltRide", 14, 18);
+
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(16, 185, 129); // emerald
+      doc.text("Electric Bike Rental Service", 14, 26);
+
+      doc.setTextColor(148, 163, 184); // slate-400
+      doc.text(`Receipt #${ride._id?.slice(-6).toUpperCase()}`, 14, 34);
+      doc.text(`Generated: ${moment().format("MMM DD, YYYY hh:mm A")}`, 120, 34);
+
+      // Divider
+      doc.setDrawColor(16, 185, 129);
+      doc.setLineWidth(0.5);
+      doc.line(14, 44, 196, 44);
+
+      // Ride Info Section
+      doc.setTextColor(15, 23, 42);
+      doc.setFontSize(13);
+      doc.setFont("helvetica", "bold");
+      doc.text("Ride Summary", 14, 54);
+
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(100, 116, 139); // slate-500
+
+      const infoRows = [
+        ["Rider Name", ride.userId?.name || "N/A"],
+        ["Email", ride.userId?.email || "N/A"],
+        ["Bike Model", ride.bikeId?.model_name || "N/A"],
+        ["Registration", ride.bikeId?.registration_number || ride.bikeId?.bikeCode || "N/A"],
+        ["Start Station", ride.startStationId?.name || "N/A"],
+        ["End Station", ride.endStationId?.name || "Ongoing"],
+        ["Start Time", ride.startTime ? moment(ride.startTime).format("MMM DD, YYYY hh:mm A") : "N/A"],
+        ["End Time", ride.endTime ? moment(ride.endTime).format("MMM DD, YYYY hh:mm A") : "Ongoing"],
+        ["Duration", ride.startTime && ride.endTime
+          ? `${Math.round((new Date(ride.endTime) - new Date(ride.startTime)) / 60000)} mins`
+          : "N/A"],
+        ["Status", ride.status?.toUpperCase() || "N/A"],
+      ];
+
+      let y = 62;
+      infoRows.forEach(([label, value]) => {
+        doc.setTextColor(100, 116, 139);
+        doc.text(label, 14, y);
+        doc.setTextColor(15, 23, 42);
+        doc.setFont("helvetica", "bold");
+        doc.text(String(value), 80, y);
+        doc.setFont("helvetica", "normal");
+        y += 8;
+      });
+
+      // Payment Section
+      doc.setFillColor(241, 245, 249); // slate-100
+      doc.roundedRect(14, y + 4, 182, 28, 3, 3, "F");
+
+      doc.setFontSize(10);
+      doc.setTextColor(100, 116, 139);
+      doc.text("Total Fare", 20, y + 14);
+
+      doc.setFontSize(18);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(16, 185, 129); // emerald
+      doc.text(`Rs. ${ride.totalCost || 0}`, 20, y + 26);
+
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(100, 116, 139);
+      doc.text("Payment deducted from VoltWallet", 100, y + 20);
+
+      // Footer
+      doc.setFillColor(15, 23, 42);
+      doc.rect(0, 272, 210, 25, "F");
+      doc.setFontSize(8);
+      doc.setTextColor(148, 163, 184);
+      doc.text("Thank you for riding with VoltRide!", 14, 282);
+      doc.text("support@voltride.com | voltride.com", 14, 288);
+      doc.setTextColor(16, 185, 129);
+      doc.text("Go Green. Ride Electric. 🌿", 140, 285);
     });
+
     doc.save(filename);
   };
 
@@ -84,16 +148,23 @@ const MyRidesTable = ({ rides = [] }) => {
       {
         header: "Rider & Vehicle",
         accessorKey: "userId.name",
-        cell: ({ row }) => (
-          <div>
-            <p className="text-sm font-black text-slate-800 leading-none mb-1">
-              {row.original.userId?.name || "Unknown"}
-            </p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1">
-              Bike: <span className="text-slate-600">{row.original.bikeId?.bikeCode || "N/A"}</span>
-            </p>
-          </div>
-        ),
+        cell: ({ row }) => {
+          const bike = row.original.bikeId;
+          return (
+            <div>
+              <p className="text-sm font-black text-slate-800 leading-none mb-1">
+                {row.original.userId?.name || "Unknown"}
+              </p>
+              {/* ✅ Multiple fields check */}
+              <p className="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1">
+                Bike:{" "}
+                <span className="text-slate-600">
+                  {bike?.registration_number || bike?.bikeCode || bike?.model_name || "N/A"}
+                </span>
+              </p>
+            </div>
+          );
+        },
       },
       {
         header: "Total Fare",
@@ -109,10 +180,12 @@ const MyRidesTable = ({ rides = [] }) => {
         accessorKey: "status",
         cell: ({ getValue }) => {
           const status = getValue();
-          // ✅ Teeno status handle kiye
           const statusStyles = {
+            Completed: "bg-emerald-50 text-emerald-700 border-emerald-100",
             completed: "bg-emerald-50 text-emerald-700 border-emerald-100",
+            Cancelled: "bg-red-50 text-red-700 border-red-100",
             cancelled: "bg-red-50 text-red-700 border-red-100",
+            Ongoing: "bg-orange-50 text-orange-700 border-orange-100",
             active: "bg-orange-50 text-orange-700 border-orange-100",
           };
           return (
@@ -137,10 +210,11 @@ const MyRidesTable = ({ rides = [] }) => {
             >
               <Eye size={15} />
             </button>
+            {/* ✅ Receipt download */}
             <button
-              onClick={() => downloadPDF([row.original], `Ride_${row.original._id.slice(-6)}.pdf`)}
+              onClick={() => downloadPDF([row.original], `Receipt_${row.original._id.slice(-6)}.pdf`)}
               className="p-2 bg-slate-50 hover:bg-slate-900 border border-slate-100 hover:border-slate-900 rounded-xl text-slate-400 hover:text-white transition-all"
-              title="Download PDF"
+              title="Download Receipt"
             >
               <Download size={15} />
             </button>

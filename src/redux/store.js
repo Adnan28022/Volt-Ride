@@ -4,6 +4,7 @@ import bikeReducer from "./reducer/bike/bikeSlice";
 import stationReducer from "./reducer/station/stationSlice";
 import rideReducer from "./reducer/Ride/RideSlice";
 import paymentReducer from "./reducer/payment/paymentSlice";
+import reviewReducer from "./reducer/review/reviewSlice";
 import {
   persistStore,
   persistReducer,
@@ -52,6 +53,7 @@ const rootReducer = combineReducers({
   stations: stationReducer,
   rides: rideReducer,
   payment: paymentReducer,
+  review: reviewReducer,
 });
 
 // ✅ Persist config — only auth is persisted (wallet balance lives here)
