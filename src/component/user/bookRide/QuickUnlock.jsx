@@ -8,7 +8,7 @@ import {
 import {
   unlockBike, lockBike, fetchBikes, updateBikeLocation,
 } from "../../../redux/reducer/bike/bikeSlice";
-import { getActiveRide } from "../../../redux/reducer/ride/RideSlice";
+import { getActiveRide } from "../../../redux/reducer/Ride/RideSlice";
 import { recordDeduction } from "../../../redux/reducer/payment/paymentSlice";
 import { submitReview, clearReviewState } from "../../../redux/reducer/review/reviewSlice";
 import toast from "react-hot-toast";
