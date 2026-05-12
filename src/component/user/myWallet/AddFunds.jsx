@@ -128,7 +128,7 @@ const CheckoutForm = ({ amount, onSuccess }) => {
 // Main AddFunds Component
 // =====================
 const AddFunds = () => {
-    const presets = ["100", "500", "1000", "2000"];
+    const presets = ["500", "1000", "2000", "2500"];
     const [amount, setAmount] = useState("");
     const [showCard, setShowCard] = useState(false);
     const [paid, setPaid] = useState(false);

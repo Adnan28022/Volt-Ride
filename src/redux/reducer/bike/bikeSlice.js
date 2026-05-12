@@ -101,10 +101,10 @@ export const lockBike = createAsyncThunk(
 // 6. Update Bike Info
 export const updateBike = createAsyncThunk(
   "bikes/updateBike",
-  async ({ id, formData }, { rejectWithValue }) => {
+  async ({ id, bikeData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${API_URL}/update/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const response = await axios.put(`${API_URL}/update/${id}`, bikeData, { // ✅ bikeData
+        headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
       return response.data.bike;

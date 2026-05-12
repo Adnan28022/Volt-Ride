@@ -2,8 +2,6 @@ import React from 'react';
 import Banner from '../../component/admin/Banner';
 import WalletCard from '../../component/user/myWallet/WalletCard';
 import AddFunds from '../../component/user/myWallet/AddFunds';
-import TransactionHistory from '../../component/user/myWallet/TransactionHistory';
-import PaymentMethods from '../../component/user/myWallet/PaymentMethods';
 
 const MyWallet = () => {
     const breadcrumbs = [{ label: "My Wallet", path: "/user/wallet", active: true }];
@@ -22,13 +20,11 @@ const MyWallet = () => {
                 {/* Left Side: Wallet & Transactions (Takes 8 columns) */}
                 <div className="col-span-12 lg:col-span-8 space-y-6">
                     <WalletCard />
-                    <TransactionHistory />
                 </div>
 
                 {/* Right Side: Add Funds & Methods (Takes 4 columns) */}
                 <div className="col-span-12 lg:col-span-4 space-y-6">
                     <AddFunds />
-                    <PaymentMethods />
 
                     {/* Extra Info Card */}
                     <div className="bg-slate-900 rounded-3xl p-6 text-white shadow-xl">
