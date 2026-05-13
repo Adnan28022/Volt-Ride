@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUserRides } from "../../../redux/reducer/ride/RideSlice";
+import { fetchUserRides } from "../../../redux/reducer/Ride/RideSlice";
 import moment from "moment";
 
 const RecentRides = () => {
