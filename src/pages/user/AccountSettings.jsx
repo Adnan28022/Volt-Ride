@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import Banner from '../../component/admin/Banner';
 import UserProfileSettings from '../../component/user/accountSettings/UserProfileSettings';
 import RidePreferences from '../../component/user/accountSettings/RidePreferences';
-import SecuritySettings from '../../component/admin/settings/SecuritySettings';
 import { Save, User, Shield, Bell, Trash2 } from "lucide-react";
 import moment from "moment";
 
@@ -14,7 +13,6 @@ const AccountSettings = () => {
     const tabs = [
         { id: 'profile', label: 'Profile', icon: <User size={16} /> },
         { id: 'prefs', label: 'Preferences', icon: <Bell size={16} /> },
-        { id: 'security', label: 'Security', icon: <Shield size={16} /> },
     ];
 
     return (
@@ -43,7 +41,6 @@ const AccountSettings = () => {
                 <div className="lg:col-span-2 space-y-6">
                     {activeTab === 'profile' && <UserProfileSettings />}
                     {activeTab === 'prefs' && <RidePreferences />}
-                    {activeTab === 'security' && <SecuritySettings />}
 
                     {/* Danger Zone */}
                     <div className="bg-red-50 border border-red-100 rounded-3xl p-6">

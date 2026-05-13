@@ -28,18 +28,15 @@ const RiderStats = () => {
         ? `${Math.floor(totalHours / 60)}h ${totalHours % 60}m`
         : `${totalHours}m`;
 
-    // 1 km = ~0.21 kg CO2 saved, 1 tree = ~21kg CO2/year
-    const treesSaved = ((totalDistance * 0.21) / 21).toFixed(1);
 
     const stats = [
         { label: "Total Rides", value: loading ? "..." : totalRides, icon: <Bike size={20} />, color: "text-blue-600", bg: "bg-blue-50" },
         { label: "Distance (KM)", value: loading ? "..." : totalDistance, icon: <Route size={20} />, color: "text-green-600", bg: "bg-green-50" },
         { label: "Hours Riding", value: loading ? "..." : hoursDisplay, icon: <Clock size={20} />, color: "text-purple-600", bg: "bg-purple-50" },
-        { label: "Trees Saved", value: loading ? "..." : treesSaved, icon: <Leaf size={20} />, color: "text-orange-600", bg: "bg-orange-50" },
     ];
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {stats.map((s, i) => (
                 <div key={i} className="bg-white border border-slate-200 p-5 rounded-2xl flex flex-col gap-3 shadow-sm hover:border-green-200 transition-all cursor-default">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.bg} ${s.color}`}>

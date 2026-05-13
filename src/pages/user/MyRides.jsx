@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Banner from "../../component/admin/Banner";
 import UserRideMetrics from "../../component/user/myRides/UserRideMetrics";
-import EcoImpactCard from "../../component/user/myRides/EcoImpactCard";
 import MyRidesTable from "../../component/user/myRides/MyRidesTable";
 import { MapPin } from "lucide-react";
 import { fetchUserRides } from "../../redux/reducer/Ride/RideSlice";
@@ -55,7 +54,6 @@ const MyRides = () => {
         </div>
 
         <div className="col-span-12 lg:col-span-4 space-y-6">
-          <EcoImpactCard rides={userRides} />
 
           <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
             <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest mb-4">
