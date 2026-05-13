@@ -3,33 +3,46 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAllRides } from "../../../redux/reducer/Ride/RideSlice";
 import { fetchBikes } from "../../../redux/reducer/bike/bikeSlice";
 import { fetchStations } from "../../../redux/reducer/station/stationSlice";
+import { fetchAllUsers } from "../../../redux/reducer/auth/AuthSlice";
 import { TrendingUp, Users, Bike, DollarSign, ArrowUpRight } from "lucide-react";
 
 const StatsGrid = () => {
     const dispatch = useDispatch();
     const { allRides } = useSelector((state) => state.rides);
     const { bikes } = useSelector((state) => state.bikes);
-    const { items: stations } = useSelector((state) => state.stations);
+    const { users } = useSelector((state) => state.auth);
 
-    useEffect(() => {
+    const fetchData = () => {
         dispatch(fetchAllRides());
         dispatch(fetchBikes());
         dispatch(fetchStations());
+        dispatch(fetchAllUsers()); // ✅ Users fetch karo
+    };
+
+    useEffect(() => {
+        fetchData();
+        const interval = setInterval(() => {
+            fetchData();
+        }, 30000);
+        return () => clearInterval(interval);
     }, [dispatch]);
 
-    // --- Real Calculations ---
+    const isCompleted = (ride) => ride.status?.toLowerCase() === "completed";
+    const isActive = (ride) =>
+        ride.status?.toLowerCase() === "ongoing" ||
+        ride.status?.toLowerCase() === "active";
+
     const totalRevenue = allRides?.reduce((sum, ride) =>
-        ride.status === "completed" ? sum + (ride.totalCost || 0) : sum, 0) || 0;
+        isCompleted(ride) ? sum + (Number(ride.totalCost) || 0) : sum, 0) || 0;
 
-    // Unique active riders
-    const activeRiderIds = new Set(
-        allRides?.filter((r) => r.status === "active").map((r) => r.userId?._id || r.userId)
-    );
-    const activeRiders = activeRiderIds.size;
+    // ✅ Verified users — admin ko exclude karo
+    const verifiedUsers = users?.filter(
+        (u) => u.isVerified === true && u.role !== "admin"
+    ).length || 0;
 
-    const liveRides = allRides?.filter((r) => r.status === "active").length || 0;
+    const liveRides = allRides?.filter(isActive).length || 0;
+    const completedRides = allRides?.filter(isCompleted).length || 0;
 
-    // Bike status "Available" (case insensitive)
     const availableBikes = bikes?.filter((b) =>
         b.status?.toLowerCase() === "available"
     ).length || 0;
@@ -39,15 +52,15 @@ const StatsGrid = () => {
             title: "Total Revenue",
             value: `Rs. ${totalRevenue.toLocaleString()}`,
             icon: <DollarSign size={20} />,
-            trend: `${allRides?.length || 0} Rides`,
+            trend: `${completedRides} Completed`,
             color: "text-green-600",
             bg: "bg-green-50"
         },
         {
-            title: "Active Riders",
-            value: activeRiders.toLocaleString(),
+            title: "Verified Riders",  // ✅ Title update
+            value: verifiedUsers.toLocaleString(),
             icon: <Users size={20} />,
-            trend: `${allRides?.length || 0} Total`,
+            trend: `${users?.filter(u => u.role !== "admin").length || 0} Total`,
             color: "text-blue-600",
             bg: "bg-blue-50"
         },
@@ -55,7 +68,7 @@ const StatsGrid = () => {
             title: "Live Rides",
             value: liveRides,
             icon: <TrendingUp size={20} />,
-            trend: `${allRides?.filter(r => r.status === "completed").length || 0} Done`,
+            trend: `${completedRides} Done`,
             color: "text-orange-600",
             bg: "bg-orange-50"
         },

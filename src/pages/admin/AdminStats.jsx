@@ -6,7 +6,6 @@ import StatsGrid from '../../component/admin/adminStats/StatsGrid';
 import RecentRides from '../../component/admin/adminStats/RecentRides';
 import UsageChart from '../../component/admin/adminStats/UsageChart';
 import FleetStatus from '../../component/admin/adminStats/FleetStatus';
-import { AlertTriangle, Zap } from "lucide-react";
 import moment from "moment";
 
 const Dashboard = () => {
@@ -37,18 +36,6 @@ const Dashboard = () => {
     ? Math.round(((todayRides - yesterdayRides) / yesterdayRides) * 100)
     : todayRides > 0 ? 100 : 0;
 
-  // --- Low battery bikes ---
-  const lowBatteryBikes = bikes?.filter((b) =>
-    b.batteryLevel !== undefined && b.batteryLevel < 20
-  ) || [];
-
-  // --- Outside service area bikes ---
-  const outsideBikes = bikes?.filter((b) =>
-    b.isOutsideArea === true || b.status?.toLowerCase() === "out of service"
-  ) || [];
-
-  const hasAlerts = lowBatteryBikes.length > 0 || outsideBikes.length > 0;
-
   return (
     <div className="space-y-6 bg-slate-50/30 min-h-screen">
 
@@ -71,45 +58,8 @@ const Dashboard = () => {
           <RecentRides />
         </div>
 
-        {/* Alerts Stack */}
-        <div className="space-y-6">
-
-          {/* Critical Alerts */}
-          <div className="bg-slate-900 rounded-xl p-5 text-white shadow-lg shadow-slate-200">
-            <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-green-400">
-              <AlertTriangle size={16} /> Critical Alerts
-            </h3>
-
-            {!hasAlerts ? (
-              <div className="p-3 bg-white/5 rounded-lg border border-white/10 text-center">
-                <p className="text-xs text-slate-400">No critical alerts 🎉</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {/* Low Battery Bikes */}
-                {lowBatteryBikes.slice(0, 2).map((bike, i) => (
-                  <div key={i} className="flex gap-3 p-3 bg-white/5 rounded-lg border border-white/10 items-center">
-                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse shrink-0"></div>
-                    <p className="text-xs text-slate-300">
-                      {bike.bikeCode || bike.bikeNumber || "Bike"} — Battery {bike.batteryLevel}% Low
-                    </p>
-                  </div>
-                ))}
-
-                {/* Outside Area Bikes */}
-                {outsideBikes.slice(0, 2).map((bike, i) => (
-                  <div key={i} className="flex gap-3 p-3 bg-white/5 rounded-lg border border-white/10 items-center">
-                    <div className="w-2 h-2 bg-orange-500 rounded-full shrink-0"></div>
-                    <p className="text-xs text-slate-300">
-                      {bike.bikeCode || bike.bikeNumber || "Bike"} — Outside Service Area
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Today's Rides */}
+        {/* Today's Rides */}
+        <div>
           <div className="bg-green-600 rounded-xl p-5 text-white flex flex-col justify-center items-center text-center gap-2 shadow-lg shadow-green-100">
             <p className="text-xs opacity-80">Today's Total Rides</p>
             <h2 className="text-3xl font-black italic tracking-tighter">{todayRides}</h2>

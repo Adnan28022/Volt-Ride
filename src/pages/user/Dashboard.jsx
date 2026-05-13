@@ -28,10 +28,11 @@ const UserDashboard = () => {
                     <div className="bg-white border border-slate-200 rounded-[2rem] overflow-hidden shadow-sm">
                         <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                             <h3 className="text-sm font-bold text-slate-800 uppercase tracking-tight flex items-center gap-2">
-                                <History size={16} className="text-slate-400" /> Recent Trips
+                                <History size={16} className="text-slate-400" /> Recent Activity
                             </h3>
-                            <button className="text-[10px] font-bold text-green-600 hover:underline">View All</button>
-                        </div>
+                            <a href="/user/my-rides" className="text-green-600 text-xs font-bold hover:text-green-700">
+                                View All
+                            </a>                        </div>
                         <RecentRides />
                     </div>
                     <EnvironmentRewards />
