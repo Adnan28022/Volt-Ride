@@ -100,63 +100,6 @@ const UserProfile = () => {
               </div>
             </div>
           </div>
-
-          {/* Security & Password Zone */}
-          <div className="bg-white border border-slate-200 rounded-[2rem] p-7 shadow-sm relative overflow-hidden group">
-            <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-              <KeyRound size={14} className="text-emerald-500" /> Security Zone
-            </h4>
-
-            <div className="space-y-3">
-              {/* Change/Forget Password Option */}
-              <button
-                onClick={handleChangePassword}
-                className="w-full flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group/item"
-              >
-                <div className="flex items-center gap-3 text-left">
-                  <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center border border-slate-200 text-slate-400 group-hover/item:text-emerald-600 group-hover/item:border-emerald-100 shadow-sm transition-all">
-                    <KeyRound size={16} />
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-black text-slate-800 uppercase tracking-tight">
-                      Change Password
-                    </p>
-                    <p className="text-[9px] text-slate-400 font-bold uppercase">
-                      {" "}
-                      Change Access Credentials
-                    </p>
-                  </div>
-                </div>
-                <ChevronRight
-                  size={14}
-                  className="text-slate-300 group-hover/item:translate-x-1 group-hover/item:text-emerald-500 transition-all"
-                />
-              </button>
-
-              <div className="h-[1px] bg-slate-100 my-2"></div>
-
-              {/* Logout Button */}
-              <button
-                onClick={handleLogout}
-                className="w-full group/btn flex items-center justify-center gap-3 px-6 py-4 bg-red-50 text-red-600 rounded-2xl text-[11px] font-black uppercase tracking-[0.15em] border border-red-100 hover:bg-red-600 hover:text-white transition-all duration-300 shadow-sm"
-              >
-                <LogOut
-                  size={16}
-                  className="group-hover/btn:-translate-x-1 transition-transform duration-300"
-                />
-                Terminate Session
-              </button>
-            </div>
-
-            <div className="mt-8 pt-5 border-t border-slate-50 flex items-center justify-between">
-              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                Protection Level
-              </span>
-              <span className="text-[9px] font-black text-emerald-500 italic bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 uppercase tracking-tighter">
-                Elite
-              </span>
-            </div>
-          </div>
         </div>
       </div>
     </div>

@@ -19,10 +19,10 @@ const RecentRides = () => {
         }
     }, [dispatch, user?._id]);
 
-    // Logged in user ki latest 5 rides
-    const recentRides = userRides
-        ?.filter((ride) => ride.userId === user?._id || ride.userId?._id === user?._id)
-        ?.slice(0, 5);
+    // ✅ Logic to get LATEST 5 rides
+    const recentRides = [...userRides] // Original array ko mutate nahi karna, isliye spread kiya
+        ?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sabse latest ride upar layein
+        ?.slice(0, 5); // Sirf top 5 rides uthayein
 
     const statusStyles = {
         ongoing: "bg-orange-100 text-orange-700",
@@ -33,11 +33,11 @@ const RecentRides = () => {
     };
 
     return (
-        <div className="bg-white border border-slate-200 overflow-hidden">
+        <div className="bg-white border border-slate-200 overflow-hidden rounded-xl"> {/* Rounded add kiya thora better look ke liye */}
 
             {loading ? (
                 <div className="py-10 text-center text-xs font-bold text-slate-400">
-                    Loading...
+                    <div className="animate-pulse">Loading Rides...</div>
                 </div>
             ) : (
                 <div className="overflow-x-auto">
@@ -55,7 +55,7 @@ const RecentRides = () => {
                             {recentRides?.length > 0 ? (
                                 recentRides.map((ride, idx) => (
                                     <tr
-                                        key={idx}
+                                        key={ride._id || idx}
                                         className="hover:bg-slate-50/50 transition-colors"
                                     >
                                         <td className="px-5 py-3.5">
@@ -74,12 +74,12 @@ const RecentRides = () => {
                                             <p className="text-sm text-slate-600 font-medium">
                                                 {ride.bikeId?.registration_number ||
                                                     ride.bikeId?.model_name ||
-                                                    "—"}
+                                                    "N/A"}
                                             </p>
 
                                             <p className="text-[10px] text-slate-400">
                                                 {ride.startStationId?.name || "—"} →
-                                                {ride.endStationId?.name || "Ongoing"}
+                                                {ride.endStationId?.name || (ride.status === 'ongoing' ? "In Progress" : "—")}
                                             </p>
                                         </td>
 

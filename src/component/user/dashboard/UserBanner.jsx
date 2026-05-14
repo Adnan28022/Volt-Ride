@@ -24,19 +24,6 @@ const UserBanner = () => {
                 </div>
             </div>
 
-            {/* Bottom Row: Badges */}
-            <div className="flex flex-wrap gap-2">
-                <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl flex-1 min-w-[120px]">
-                    <Leaf size={14} className="text-green-600 shrink-0" />
-                    <span className="text-[10px] font-black uppercase text-slate-500 truncate">Eco Level: 04</span>
-                </div>
-                <div className="flex items-center gap-2 bg-blue-50 border border-blue-100 px-3 py-2 rounded-xl flex-1 min-w-[120px]">
-                    <ShieldCheck size={14} className="text-blue-600 shrink-0" />
-                    <span className="text-[10px] font-black uppercase text-blue-500 truncate">
-                        {user?.email || "Verified Rider"}
-                    </span>
-                </div>
-            </div>
         </div>
     );
 };

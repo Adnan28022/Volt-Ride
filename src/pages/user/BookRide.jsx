@@ -4,7 +4,6 @@ import DiscoveryMap from "../../component/user/bookRide/DiscoveryMap";
 import RideInstructions from "../../component/user/bookRide/RideInstructions";
 import QuickUnlock from "../../component/user/bookRide/QuickUnlock";
 import StationSelectionCard from "../../component/user/bookRide/StationSelectionCard";
-import SafetyBanner from "../../component/user/bookRide/SafetyBanner";
 import { useSelector } from "react-redux";
 import ActiveBikeRide from "../../component/user/bookRide/ActiveBikeRide";
 
@@ -74,11 +73,6 @@ const BookRide = () => {
         <div className="col-span-1 md:hidden">
           <RideInstructions />
         </div>
-      </div>
-
-      {/* 3. Bottom Full Width Section */}
-      <div className="w-full pt-4">
-        <SafetyBanner />
       </div>
     </div>
   );

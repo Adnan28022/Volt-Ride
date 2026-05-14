@@ -4,7 +4,6 @@ import UserBanner from '../../component/user/dashboard/UserBanner';
 import RiderStats from '../../component/user/dashboard/RiderStats';
 import RecentRides from '../../component/user/dashboard/RecentRides';
 import NearbyStations from '../../component/user/dashboard/NearByStations';
-import EnvironmentRewards from '../../component/user/dashboard/EnvironmentRewards';
 import { History, ArrowRight, Zap, Navigation } from "lucide-react";
 
 const UserDashboard = () => {
@@ -35,49 +34,10 @@ const UserDashboard = () => {
                             </a>                        </div>
                         <RecentRides />
                     </div>
-                    <EnvironmentRewards />
                 </div>
 
                 {/* Right Section */}
                 <div className="lg:col-span-1 space-y-6">
-
-                    {/* Active Ride Status — Real Data */}
-                    <div className="bg-slate-900 rounded-[2rem] p-6 text-white shadow-xl relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-3xl group-hover:scale-150 transition-all"></div>
-                        <div className="relative z-10">
-                            <div className="flex items-center gap-2 mb-4 text-slate-400">
-                                <div className={`w-2 h-2 rounded-full ${isRiding ? "bg-green-500 animate-ping" : "bg-slate-500"}`}></div>
-                                <span className="text-[10px] font-bold uppercase tracking-widest">
-                                    {isRiding ? "Ride Active" : "Live Status"}
-                                </span>
-                            </div>
-
-                            {isRiding && activeRide ? (
-                                <>
-                                    <h4 className="text-sm font-black italic tracking-tight text-green-400">Ride In Progress</h4>
-                                    <div className="mt-3 space-y-1">
-                                        <p className="text-[11px] text-slate-400">
-                                            Bike: <span className="text-white font-bold">{activeRide.bikeId || "—"}</span>
-                                        </p>
-                                        <p className="text-[11px] text-slate-400">
-                                            Station: <span className="text-white font-bold">{activeRide.startStation || "—"}</span>
-                                        </p>
-                                        <p className="text-[11px] text-slate-400">
-                                            Started: <span className="text-white font-bold">
-                                                {activeRide.startTime ? new Date(activeRide.startTime).toLocaleTimeString() : "—"}
-                                            </span>
-                                        </p>
-                                    </div>
-                                </>
-                            ) : (
-                                <h4 className="text-sm font-black italic tracking-tight">No Active Ride Currently</h4>
-                            )}
-
-                            <button className="w-full mt-6 py-3.5 bg-green-600 hover:bg-green-700 text-slate-900 font-black rounded-2xl text-xs transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-900/20 active:scale-95">
-                                <Navigation size={14} /> {isRiding ? "Track My Ride" : "Find Nearest VoltBike"}
-                            </button>
-                        </div>
-                    </div>
 
                     {/* Wallet — Abhi wallet slice nahi hai */}
                     <div className="bg-white border border-slate-200 rounded-[2rem] p-6 shadow-sm group hover:border-green-200 transition-all">
