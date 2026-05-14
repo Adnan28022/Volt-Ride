@@ -27,8 +27,8 @@ export const addBike = createAsyncThunk(
   "bikes/addBike",
   async (formData, { rejectWithValue }) => {
     try {
+      // ✅ Headers hatane se Axios khud 'multipart/form-data' aur boundary set karega
       const response = await axios.post(`${API_URL}/add`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
       return response.data.bike;
@@ -103,8 +103,8 @@ export const updateBike = createAsyncThunk(
   "bikes/updateBike",
   async ({ id, bikeData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${API_URL}/update/${id}`, bikeData, { // ✅ bikeData
-        headers: { "Content-Type": "application/json" },
+      // ✅ PUT request with automatic content-type detection
+      const response = await axios.put(`${API_URL}/update/${id}`, bikeData, {
         withCredentials: true,
       });
       return response.data.bike;
@@ -115,7 +115,6 @@ export const updateBike = createAsyncThunk(
     }
   },
 );
-
 // 7. Delete Bike
 export const deleteBike = createAsyncThunk(
   "bikes/deleteBike",
