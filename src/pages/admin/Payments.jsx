@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AdminPageHeader from "../../component/admin/Banner";
-import StripePayouts from "../../component/admin/payments/StripePayouts";
 import TransactionTable from "../../component/admin/payments/TransactionTable";
 import { ShieldCheck, Activity } from "lucide-react";
 import { fetchAllRides } from "../../redux/reducer/Ride/RideSlice";
@@ -57,15 +56,9 @@ const PaymentManagement = () => {
 
 
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1">
         <div className="lg:col-span-2">
           <TransactionTable rides={allRides} />
-        </div>
-
-        <div className="flex flex-col gap-8">
-          <StripePayouts netRevenue={financialStats.net} />
-
-         
         </div>
       </div>
     </div>

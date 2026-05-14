@@ -48,6 +48,7 @@ const UsersList = () => {
         <UserFilterBar
           setSearchTerm={setSearchTerm}
           setStatusFilter={setStatusFilter}
+          users={filteredUsers} // ✅ Ye line add karein
         />
         <UserTable filteredUsers={filteredUsers} />
       </div>
