@@ -33,6 +33,8 @@ import UserProfile from "../pages/user/UserProfile.jsx";
 import StationManagement from "../pages/admin/StationManagement.jsx";
 import SupportPage from "../pages/Support.jsx";
 import Error404 from "../pages/Error404.jsx";
+import ForgotPassword from "../auth/ForgotPassword.jsx";
+import ResetPassword from "../auth/ResetPassword.jsx";
 
 const AppRoutes = () => {
   return (
@@ -53,6 +55,8 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/verify-otp" element={<VerifyOtp />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* ADMIN PROTECTED ROUTES */}
       <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>

@@ -3,15 +3,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, clearErrors, clearMessages } from "../redux/reducer/auth/AuthSlice";
 import { Mail, Lock, ArrowRight, Zap, Fingerprint, ChevronLeft, Eye, EyeOff, Loader2 } from "lucide-react";
-import toast from "react-hot-toast";
+import Swal from 'sweetalert2'; // Import SweetAlert2
+import withReactContent from 'sweetalert2-react-content'; // Import React Content for SweetAlert2
+
+const MySwal = withReactContent(Swal); // Initialize SweetAlert2 with React Content
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loading, error, isAuthenticated, user } = useSelector((state) => state.auth);
+  const { loading, error, isAuthenticated, user, message } = useSelector((state) => state.auth); // Added message
 
   const [showPassword, setShowPassword] = useState(false);
-  const [formSubmitted, setFormSubmitted] = useState(false); // <-- Yeh add kiya
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -23,30 +26,58 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setFormSubmitted(true); // <-- Track karo ke form submit hua
+    setFormSubmitted(true);
     dispatch(loginUser(formData));
   };
 
   useEffect(() => {
-    // Sirf tab run karo jab form submit hua ho
     if (!formSubmitted) return;
 
     if (error) {
-      toast.error(error);
+      MySwal.fire({
+        icon: 'error',
+        title: 'Login Failed!',
+        text: error,
+        customClass: {
+          confirmButton: 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded',
+        },
+        buttonsStyling: false,
+      });
       dispatch(clearErrors());
       setFormSubmitted(false);
     }
 
     if (isAuthenticated && user) {
-      toast.success(`Access Authorized: Welcome ${user.name}`);
+      MySwal.fire({
+        icon: 'success',
+        title: 'Access Authorized!',
+        text: `Welcome ${user.name}`,
+        showConfirmButton: false,
+        timer: 1500,
+      });
       const targetPath = user.role === "admin" ? "/admin/dashboard" : "/user/dashboard";
-      setTimeout(() => {
-        navigate(targetPath);
-        dispatch(clearMessages());
-        setFormSubmitted(false);
-      }, 500);
+      navigate(targetPath);
+      dispatch(clearMessages()); // Clear messages after showing success
+      setFormSubmitted(false);
     }
   }, [error, isAuthenticated, user, formSubmitted, dispatch, navigate]);
+
+  // Handle messages from other actions (e.g., successful OTP verification or password reset)
+  useEffect(() => {
+    if (message && !loading && !error && !isAuthenticated) {
+      MySwal.fire({
+        icon: 'info', // Using info for generic messages that are not errors or direct success of login
+        title: 'Information',
+        text: message,
+        customClass: {
+          confirmButton: 'bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-4 rounded',
+        },
+        buttonsStyling: false,
+      });
+      dispatch(clearMessages()); // Clear message after showing
+    }
+  }, [message, loading, error, isAuthenticated, dispatch]);
+
 
   // Already logged in hai toh redirect karo
   useEffect(() => {
@@ -54,7 +85,7 @@ const Login = () => {
       const targetPath = user.role === "admin" ? "/admin/dashboard" : "/user/dashboard";
       navigate(targetPath);
     }
-  }, []); // Sirf mount par
+  }, [isAuthenticated, user, loading, navigate]); // Added dependencies
 
   return (
     <div className="min-h-screen w-full bg-white flex flex-col lg:flex-row overflow-hidden font-sans">
@@ -130,9 +161,13 @@ const Login = () => {
               </div>
             </div>
 
+            <div className="text-right text-[11px] font-bold">
+              <Link to="/forgot-password" className="text-emerald-600 hover:underline">Forgot Password?</Link>
+            </div>
+
             <button
               type="submit"
-              disabled={loading && formSubmitted} // <-- Sirf form submit hone par disable
+              disabled={loading && formSubmitted}
               className="w-full py-6 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs italic transition-all hover:bg-emerald-600 shadow-2xl shadow-slate-200 flex items-center justify-center gap-3 active:scale-[0.98]"
             >
               {loading && formSubmitted ? <Loader2 className="animate-spin" /> : "Authorize & Enter"}

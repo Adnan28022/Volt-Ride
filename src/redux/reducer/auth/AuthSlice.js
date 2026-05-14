@@ -7,14 +7,61 @@ const API = axios.create({
     withCredentials: true,
 });
 
-export const registerUser = createAsyncThunk("auth/register", async (userData, { rejectWithValue }) => { try { const response = await API.post("/register", userData); return response.data; } catch (error) { return rejectWithValue(error.response.data.message); } });
-export const verifyOTP = createAsyncThunk("auth/verifyOTP", async (otpData, { rejectWithValue }) => { try { const response = await API.post("/verify-otp", otpData); return response.data; } catch (error) { return rejectWithValue(error.response.data.message); } });
-export const loginUser = createAsyncThunk("auth/login", async (loginData, { rejectWithValue }) => { try { const response = await API.post("/login", loginData); return response.data; } catch (error) { return rejectWithValue(error.response.data.message); } });
-export const fetchAllUsers = createAsyncThunk("auth/fetchAllUsers", async (_, { rejectWithValue }) => { try { const response = await API.get("/users"); return response.data; } catch (error) { return rejectWithValue(error.response.data.message); } });
-export const deleteUserAccount = createAsyncThunk("auth/deleteUser", async (id, { rejectWithValue }) => { try { const response = await API.delete(`/user/${id}`); return { id, message: response.data.message }; } catch (error) { return rejectWithValue(error.response.data.message); } });
-export const resendOTP = createAsyncThunk("auth/resendOTP", async (email, { rejectWithValue }) => { try { const response = await API.post("/resend-otp", { email }); return response.data; } catch (error) { return rejectWithValue(error.response.data.message); } });
-export const logoutUser = createAsyncThunk("auth/logout", async (_, { rejectWithValue }) => { try { const response = await API.get("/logout"); return response.data; } catch (error) { return rejectWithValue(error.response.data.message); } });
-export const confirmWalletTopup = createAsyncThunk("auth/confirmWalletTopup", async ({ paymentIntentId, userId, amount }, { rejectWithValue }) => { try { const response = await axios.post(`${API_BASE_URL}/payment/confirm`, { paymentIntentId, userId, amount }, { withCredentials: true }); return response.data; } catch (error) { return rejectWithValue(error.response?.data?.message || "Payment failed"); } });
+// ================= ASYNC THUNKS =================
+
+export const registerUser = createAsyncThunk("auth/register", async (userData, { rejectWithValue }) => {
+    try { const response = await API.post("/register", userData); return response.data; }
+    catch (error) { return rejectWithValue(error.response.data.message); }
+});
+
+export const verifyOTP = createAsyncThunk("auth/verifyOTP", async (otpData, { rejectWithValue }) => {
+    try { const response = await API.post("/verify-otp", otpData); return response.data; }
+    catch (error) { return rejectWithValue(error.response.data.message); }
+});
+
+export const loginUser = createAsyncThunk("auth/login", async (loginData, { rejectWithValue }) => {
+    try { const response = await API.post("/login", loginData); return response.data; }
+    catch (error) { return rejectWithValue(error.response.data.message); }
+});
+
+export const fetchAllUsers = createAsyncThunk("auth/fetchAllUsers", async (_, { rejectWithValue }) => {
+    try { const response = await API.get("/users"); return response.data; }
+    catch (error) { return rejectWithValue(error.response.data.message); }
+});
+
+export const deleteUserAccount = createAsyncThunk("auth/deleteUser", async (id, { rejectWithValue }) => {
+    try { const response = await API.delete(`/user/${id}`); return { id, message: response.data.message }; }
+    catch (error) { return rejectWithValue(error.response.data.message); }
+});
+
+export const resendOTP = createAsyncThunk("auth/resendOTP", async (email, { rejectWithValue }) => {
+    try { const response = await API.post("/resend-otp", { email }); return response.data; }
+    catch (error) { return rejectWithValue(error.response.data.message); }
+});
+
+// New: Forgot Password Thunk
+export const forgotPassword = createAsyncThunk("auth/forgotPassword", async (email, { rejectWithValue }) => {
+    try { const response = await API.post("/forgot-password", { email }); return response.data; }
+    catch (error) { return rejectWithValue(error.response.data.message); }
+});
+
+// New: Reset Password Thunk
+export const resetPassword = createAsyncThunk("auth/resetPassword", async (resetData, { rejectWithValue }) => {
+    try { const response = await API.post("/reset-password", resetData); return response.data; }
+    catch (error) { return rejectWithValue(error.response.data.message); }
+});
+
+export const logoutUser = createAsyncThunk("auth/logout", async (_, { rejectWithValue }) => {
+    try { const response = await API.get("/logout"); return response.data; }
+    catch (error) { return rejectWithValue(error.response.data.message); }
+});
+
+export const confirmWalletTopup = createAsyncThunk("auth/confirmWalletTopup", async ({ paymentIntentId, userId, amount }, { rejectWithValue }) => {
+    try { const response = await axios.post(`${API_BASE_URL}/payment/confirm`, { paymentIntentId, userId, amount }, { withCredentials: true }); return response.data; }
+    catch (error) { return rejectWithValue(error.response?.data?.message || "Payment failed"); }
+});
+
+// ================= SLICE =================
 
 const authSlice = createSlice({
     name: "auth",
@@ -32,8 +79,15 @@ const authSlice = createSlice({
             .addCase(fetchAllUsers.fulfilled, (state, action) => { state.loading = false; state.users = action.payload.users || action.payload || []; })
             .addCase(deleteUserAccount.fulfilled, (state, action) => { state.loading = false; state.message = action.payload.message; state.users = state.users.filter((u) => u._id !== action.payload.id); })
             .addCase(resendOTP.fulfilled, (state, action) => { state.loading = false; state.message = action.payload.message; })
+
+            // Handle Forgot & Reset Password States
+            .addCase(forgotPassword.fulfilled, (state, action) => { state.loading = false; state.message = action.payload.message; })
+            .addCase(resetPassword.fulfilled, (state, action) => { state.loading = false; state.message = action.payload.message; })
+
             .addCase(logoutUser.fulfilled, (state) => { state.loading = false; state.user = null; state.users = []; state.isAuthenticated = false; state.message = "Logged out successfully"; })
             .addCase(confirmWalletTopup.fulfilled, (state, action) => { state.loading = false; if (state.user && action.payload.walletBalance !== undefined) { state.user.walletBalance = action.payload.walletBalance; } })
+
+            // Matchers for Loading and Error Handling
             .addMatcher((action) => action.type.endsWith("/pending"), (state) => { state.loading = true; state.error = null; })
             .addMatcher((action) => action.type.endsWith("/rejected"), (state, action) => { state.loading = false; state.error = action.payload; });
     },
