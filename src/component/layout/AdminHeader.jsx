@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllRides } from "../../redux/reducer/Ride/RideSlice";
-import { fetchBikes } from "../../redux/reducer/Bike/BikeSlice";
+import { fetchBikes } from "../../redux/reducer/bike/bikeSlice";
 import { fetchStations } from "../../redux/reducer/Station/StationSlice";
 import Swal from 'sweetalert2'; // Import sweetalert2
 
