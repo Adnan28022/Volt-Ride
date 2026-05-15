@@ -1,11 +1,17 @@
 import { History, Route, Clock, CreditCard } from "lucide-react";
+import { fetchAllRides } from "../../../redux/reducer/Ride/RideSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const HistoryStats = ({ rides }) => {
   const totalRides = rides.length;
-  const totalRevenue = rides.reduce(
-    (acc, ride) => acc + (Number(ride.fare) || 0),
-    0,
-  );
+  const { allRides } = useSelector((state) => state.rides);
+  const dispatch = useDispatch();
+  const isCompleted = (ride) => ride.status?.toLowerCase() === "completed";
+  const fetchData = () => {
+    dispatch(fetchAllRides());
+  };
+  const totalRevenue = allRides?.reduce((sum, ride) =>
+    isCompleted(ride) ? sum + (Number(ride.totalCost) || 0) : sum, 0) || 0;
   const totalDistance = rides.reduce(
     (acc, ride) => acc + (Number(ride.distance) || 0),
     0,
