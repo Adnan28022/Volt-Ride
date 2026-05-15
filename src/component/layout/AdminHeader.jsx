@@ -7,7 +7,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllRides } from "../../redux/reducer/Ride/RideSlice";
 import { fetchBikes } from "../../redux/reducer/bike/bikeSlice";
-import { fetchStations } from "../../redux/reducer/Station/StationSlice";
+import { fetchStations } from "../../redux/reducer/station/stationSlice";
 import Swal from 'sweetalert2';
 
 const AdminHeader = ({ toggleSidebar, isCollapsed }) => {
