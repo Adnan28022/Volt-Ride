@@ -42,13 +42,13 @@ const UserTable = ({ filteredUsers = [] }) => {
     if (id === currentUser?._id || id === currentUser?.id) {
       return Swal.fire(
         "Error",
-        "Aap apna account delete nahi kar sakte!",
+        "You can't delete your account!",
         "error"
       );
     }
     Swal.fire({
       title: `Delete ${name}?`,
-      text: "Kya aap waqayi is user ko remove karna chahte hain?",
+      text: "Do you want to remove this user?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#ef4444",
