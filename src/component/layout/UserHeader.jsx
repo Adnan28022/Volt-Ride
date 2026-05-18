@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import {
     Menu, Bell, Calendar, ChevronDown, User,
     PanelLeftClose, PanelLeftOpen, LogOut, Settings,
-    HelpCircle, Wallet, ExternalLink
+
+    // ✅ ICONS ADD KIYE HAIN
+    HelpCircle, Wallet, ExternalLink, AlertTriangle, Bike, CheckCircle2
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,7 +15,6 @@ import toast from "react-hot-toast";
 const UserHeader = ({ toggleSidebar, isCollapsed }) => {
     const [showUserDropdown, setShowUserDropdown] = useState(false);
     const [showNotifDropdown, setShowNotifDropdown] = useState(false);
-    // ✅ Firebase notifications state
     const [firebaseNotifs, setFirebaseNotifs] = useState([]);
 
     const userRef = useRef(null);
@@ -27,11 +28,9 @@ const UserHeader = ({ toggleSidebar, isCollapsed }) => {
     const walletBalance = user?.walletBalance || 0;
     const isLowBalance = walletBalance < 100;
 
-    // ✅ Firebase foreground notifications listen karo
     useEffect(() => {
         if (user?.role !== "user") return;
 
-        // ✅ Continuous listener — har notification aaye gi
         const unsubscribe = onMessageListener((payload) => {
             const newNotif = {
                 id: Date.now(),
@@ -43,15 +42,14 @@ const UserHeader = ({ toggleSidebar, isCollapsed }) => {
             setFirebaseNotifs((prev) => [newNotif, ...prev].slice(0, 5));
             toast.success(`${newNotif.title}\n${newNotif.message}`, {
                 duration: 5000,
-                icon: "🔔",
+                // ✅ EMOJI KI JAGAH ICON
+                icon: <Bell size={18} className="text-green-600" />,
             });
         });
 
-        // ✅ Cleanup
         return () => unsubscribe && unsubscribe();
     }, [user]);
 
-    // Rides se bhi notifications
     const rideNotifs = userRides?.slice(0, 3).map((ride) => ({
         id: ride._id,
         message: `Ride #${ride._id?.slice(-6).toUpperCase()} — ${ride.status}`,
@@ -59,7 +57,6 @@ const UserHeader = ({ toggleSidebar, isCollapsed }) => {
         type: "ride",
     })) || [];
 
-    // ✅ Firebase + ride notifications merge
     const allNotifications = [...firebaseNotifs, ...rideNotifs];
     const notifCount = allNotifications.length + (isLowBalance ? 1 : 0);
 
@@ -95,11 +92,19 @@ const UserHeader = ({ toggleSidebar, isCollapsed }) => {
         return `${Math.floor(diff / 1440)} days ago`;
     };
 
+    // ✅ YEH FUNCTION UPDATE KIYA HAI - AB JSX RETURN KAREGA
     const getNotifIcon = (type) => {
-        if (type === "ride_start") return "🚴";
-        if (type === "ride_complete") return "✅";
-        if (type === "wallet_topup") return "💰";
-        return "🔔";
+        const iconProps = { size: 18, className: "shrink-0" };
+        switch (type) {
+            case "ride_start":
+                return <Bike {...iconProps} className="text-blue-500" />;
+            case "ride_complete":
+                return <CheckCircle2 {...iconProps} className="text-green-500" />;
+            case "wallet_topup":
+                return <Wallet {...iconProps} className="text-amber-500" />;
+            default:
+                return <Bell {...iconProps} className="text-slate-500" />;
+        }
     };
 
     return (
@@ -154,32 +159,41 @@ const UserHeader = ({ toggleSidebar, isCollapsed }) => {
                                 </span>
                             </div>
                             <div className="max-h-64 overflow-y-auto">
-                                {/* Low balance alert */}
+                                {/* ✅ Low balance alert - EMOJI REMOVED */}
                                 {isLowBalance && (
                                     <div className="px-4 py-3 hover:bg-red-50 cursor-pointer transition-colors border-b border-slate-50">
-                                        <p className="text-sm text-red-600 font-medium">
-                                            ⚠️ Low Wallet Balance: Rs. {walletBalance}
+                                        <p className="flex items-start gap-2 text-sm text-red-600 font-medium">
+                                            <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+                                            <span>Low Wallet Balance: Rs. {walletBalance}</span>
                                         </p>
-                                        <p className="text-[10px] text-slate-400 mt-0.5">Tap to top up</p>
+                                        <p className="text-[10px] text-slate-400 mt-0.5 pl-6">Tap to top up</p>
                                     </div>
                                 )}
 
-                                {/* ✅ Firebase notifications */}
+                                {/* ✅ Firebase notifications - EMOJI REMOVED */}
                                 {firebaseNotifs.map((notif) => (
                                     <div key={notif.id} className="px-4 py-3 hover:bg-green-50 cursor-pointer transition-colors border-b border-slate-50">
-                                        <p className="text-sm text-slate-700 font-bold">
-                                            {getNotifIcon(notif.type)} {notif.title}
-                                        </p>
-                                        <p className="text-[11px] text-slate-500 mt-0.5">{notif.message}</p>
-                                        <p className="text-[10px] text-slate-400 mt-0.5">{timeAgo(notif.time)}</p>
+                                        <div className="flex items-start gap-3">
+                                            {getNotifIcon(notif.type)}
+                                            <div>
+                                                <p className="text-sm text-slate-700 font-bold">{notif.title}</p>
+                                                <p className="text-[11px] text-slate-500 mt-0.5">{notif.message}</p>
+                                                <p className="text-[10px] text-slate-400 mt-1">{timeAgo(notif.time)}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 ))}
 
-                                {/* Ride notifications */}
+                                {/* ✅ Ride notifications - EMOJI REMOVED */}
                                 {rideNotifs.map((notif) => (
                                     <div key={notif.id} className="px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors border-b border-slate-50">
-                                        <p className="text-sm text-slate-700 font-medium">🚴 {notif.message}</p>
-                                        <p className="text-[10px] text-slate-400 mt-0.5">{timeAgo(notif.time)}</p>
+                                        <div className="flex items-start gap-3">
+                                            <Bike size={18} className="text-slate-500 shrink-0" />
+                                            <div>
+                                                <p className="text-sm text-slate-700 font-medium">{notif.message}</p>
+                                                <p className="text-[10px] text-slate-400 mt-1">{timeAgo(notif.time)}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 ))}
 
