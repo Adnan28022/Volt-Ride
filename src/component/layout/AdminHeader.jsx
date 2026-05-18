@@ -52,7 +52,8 @@ const AdminHeader = ({ toggleSidebar, isCollapsed }) => {
       setFirebaseNotifs((prev) => [newNotif, ...prev].slice(0, 5));
       toast.success(`${newNotif.title}\n${newNotif.desc}`, {
         duration: 5000,
-        icon: "🔔",
+        // ✅ YAHAN EMOJI KO ICON SE REPLACE KIYA HAI
+        icon: <Bell size={18} className="text-green-600" />,
       });
     });
 
