@@ -7,10 +7,14 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../redux/reducer/auth/AuthSlice";
+import { onMessageListener } from "../../config/firebase";
+import toast from "react-hot-toast";
 
 const UserHeader = ({ toggleSidebar, isCollapsed }) => {
     const [showUserDropdown, setShowUserDropdown] = useState(false);
     const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+    // ✅ Firebase notifications state
+    const [firebaseNotifs, setFirebaseNotifs] = useState([]);
 
     const userRef = useRef(null);
     const notifRef = useRef(null);
@@ -20,17 +24,44 @@ const UserHeader = ({ toggleSidebar, isCollapsed }) => {
     const { user } = useSelector((state) => state.auth);
     const { userRides } = useSelector((state) => state.rides);
 
-    // Real notifications rides se
-    const notifications = userRides?.slice(0, 3).map((ride) => ({
+    const walletBalance = user?.walletBalance || 0;
+    const isLowBalance = walletBalance < 100;
+
+    // ✅ Firebase foreground notifications listen karo
+    useEffect(() => {
+        if (user?.role !== "user") return;
+
+        // ✅ Continuous listener — har notification aaye gi
+        const unsubscribe = onMessageListener((payload) => {
+            const newNotif = {
+                id: Date.now(),
+                title: payload.notification?.title || "Notification",
+                message: payload.notification?.body || "",
+                time: new Date(),
+                type: payload.data?.type || "general",
+            };
+            setFirebaseNotifs((prev) => [newNotif, ...prev].slice(0, 5));
+            toast.success(`${newNotif.title}\n${newNotif.message}`, {
+                duration: 5000,
+                icon: "🔔",
+            });
+        });
+
+        // ✅ Cleanup
+        return () => unsubscribe && unsubscribe();
+    }, [user]);
+
+    // Rides se bhi notifications
+    const rideNotifs = userRides?.slice(0, 3).map((ride) => ({
+        id: ride._id,
         message: `Ride #${ride._id?.slice(-6).toUpperCase()} — ${ride.status}`,
         time: ride.endTime || ride.startTime,
+        type: "ride",
     })) || [];
 
-    // Wallet balance
-    const walletBalance = user?.walletBalance || 0;
-
-    // Low balance check
-    const isLowBalance = walletBalance < 100;
+    // ✅ Firebase + ride notifications merge
+    const allNotifications = [...firebaseNotifs, ...rideNotifs];
+    const notifCount = allNotifications.length + (isLowBalance ? 1 : 0);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -62,6 +93,13 @@ const UserHeader = ({ toggleSidebar, isCollapsed }) => {
         if (diff < 60) return `${diff} min ago`;
         if (diff < 1440) return `${Math.floor(diff / 60)} hr ago`;
         return `${Math.floor(diff / 1440)} days ago`;
+    };
+
+    const getNotifIcon = (type) => {
+        if (type === "ride_start") return "🚴";
+        if (type === "ride_complete") return "✅";
+        if (type === "wallet_topup") return "💰";
+        return "🔔";
     };
 
     return (
@@ -102,39 +140,52 @@ const UserHeader = ({ toggleSidebar, isCollapsed }) => {
                         className={`relative p-2.5 rounded-xl transition-all ${showNotifDropdown ? 'bg-green-100 text-green-600' : 'text-slate-500 hover:bg-slate-100'}`}
                     >
                         <Bell size={20} />
-                        {/* ✅ Real notifications count */}
-                        {(notifications.length > 0 || isLowBalance) && (
-                            <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white"></span>
+                        {notifCount > 0 && (
+                            <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white animate-pulse"></span>
                         )}
                     </button>
 
                     {showNotifDropdown && (
                         <div className="absolute right-0 mt-3 w-80 bg-white border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 py-3 z-50 animate-in fade-in zoom-in-95 duration-200">
                             <div className="px-4 pb-2 border-b border-slate-50 flex justify-between items-center">
-                                <span className="font-bold text-slate-800">Alerts</span>
+                                <span className="font-bold text-slate-800">Notifications</span>
                                 <span className="text-[10px] bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-bold">
-                                    {notifications.length + (isLowBalance ? 1 : 0)} New
+                                    {notifCount} New
                                 </span>
                             </div>
-                            <div className="max-h-60 overflow-y-auto">
+                            <div className="max-h-64 overflow-y-auto">
                                 {/* Low balance alert */}
                                 {isLowBalance && (
                                     <div className="px-4 py-3 hover:bg-red-50 cursor-pointer transition-colors border-b border-slate-50">
                                         <p className="text-sm text-red-600 font-medium">
-                                            Low Wallet Balance: Rs. {walletBalance} left
+                                            ⚠️ Low Wallet Balance: Rs. {walletBalance}
                                         </p>
                                         <p className="text-[10px] text-slate-400 mt-0.5">Tap to top up</p>
                                     </div>
                                 )}
-                                {/* Ride notifications */}
-                                {notifications.length > 0 ? notifications.map((notif, i) => (
-                                    <div key={i} className="px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors border-b border-slate-50">
-                                        <p className="text-sm text-slate-700 font-medium">{notif.message}</p>
+
+                                {/* ✅ Firebase notifications */}
+                                {firebaseNotifs.map((notif) => (
+                                    <div key={notif.id} className="px-4 py-3 hover:bg-green-50 cursor-pointer transition-colors border-b border-slate-50">
+                                        <p className="text-sm text-slate-700 font-bold">
+                                            {getNotifIcon(notif.type)} {notif.title}
+                                        </p>
+                                        <p className="text-[11px] text-slate-500 mt-0.5">{notif.message}</p>
                                         <p className="text-[10px] text-slate-400 mt-0.5">{timeAgo(notif.time)}</p>
                                     </div>
-                                )) : (
+                                ))}
+
+                                {/* Ride notifications */}
+                                {rideNotifs.map((notif) => (
+                                    <div key={notif.id} className="px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors border-b border-slate-50">
+                                        <p className="text-sm text-slate-700 font-medium">🚴 {notif.message}</p>
+                                        <p className="text-[10px] text-slate-400 mt-0.5">{timeAgo(notif.time)}</p>
+                                    </div>
+                                ))}
+
+                                {allNotifications.length === 0 && !isLowBalance && (
                                     <div className="px-4 py-6 text-center">
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase">No new alerts</p>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase">No new notifications</p>
                                     </div>
                                 )}
                             </div>
@@ -161,7 +212,6 @@ const UserHeader = ({ toggleSidebar, isCollapsed }) => {
                             )}
                         </div>
                         <div className="text-left hidden sm:block">
-                            {/* ✅ Real user name */}
                             <p className="text-sm font-bold text-slate-900 group-hover:text-green-600 transition-colors truncate max-w-[100px]">
                                 {user?.name || "Rider"}
                             </p>
@@ -176,7 +226,6 @@ const UserHeader = ({ toggleSidebar, isCollapsed }) => {
                         <div className="absolute right-0 mt-3 w-56 bg-white border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
                             <div className="px-4 py-2 border-b border-slate-50 mb-1">
                                 <p className="text-xs text-slate-400">Logged in as</p>
-                                {/* ✅ Real email */}
                                 <p className="text-sm font-bold text-slate-800 truncate">{user?.email || "—"}</p>
                             </div>
 
@@ -186,7 +235,6 @@ const UserHeader = ({ toggleSidebar, isCollapsed }) => {
                             <Link to="/user/profile" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-green-600 transition-colors">
                                 <User size={18} /> My Profile
                             </Link>
-                            {/* ✅ Real wallet balance */}
                             <Link to="/user/wallet" className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-green-600 transition-colors">
                                 <Wallet size={18} /> Wallet (Rs. {walletBalance.toLocaleString()})
                             </Link>
