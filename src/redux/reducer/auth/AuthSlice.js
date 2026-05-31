@@ -76,7 +76,11 @@ const authSlice = createSlice({
             .addCase(registerUser.fulfilled, (state, action) => { state.loading = false; state.message = action.payload.message; })
             .addCase(verifyOTP.fulfilled, (state, action) => { state.loading = false; state.message = action.payload.message; })
             .addCase(loginUser.fulfilled, (state, action) => { state.loading = false; state.user = action.payload.user; state.isAuthenticated = true; state.message = action.payload.message; })
-            .addCase(fetchAllUsers.fulfilled, (state, action) => { state.loading = false; state.users = action.payload.users || action.payload || []; })
+            .addCase(fetchAllUsers.fulfilled, (state, action) => {
+                state.loading = false;
+                // Controller "users" key bhej raha hai, usay pakrein
+                state.users = action.payload.users || [];
+            })
             .addCase(deleteUserAccount.fulfilled, (state, action) => { state.loading = false; state.message = action.payload.message; state.users = state.users.filter((u) => u._id !== action.payload.id); })
             .addCase(resendOTP.fulfilled, (state, action) => { state.loading = false; state.message = action.payload.message; })
 
