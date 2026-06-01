@@ -7,6 +7,15 @@ const API = axios.create({
     withCredentials: true,
 });
 
+
+// YE ADD KAREIN: Har request se pehle localStorage se token utha kar header mein dal dega
+API.interceptors.request.use((config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
 // ================= ASYNC THUNKS =================
 
 export const registerUser = createAsyncThunk("auth/register", async (userData, { rejectWithValue }) => {
@@ -75,7 +84,13 @@ const authSlice = createSlice({
         builder
             .addCase(registerUser.fulfilled, (state, action) => { state.loading = false; state.message = action.payload.message; })
             .addCase(verifyOTP.fulfilled, (state, action) => { state.loading = false; state.message = action.payload.message; })
-            .addCase(loginUser.fulfilled, (state, action) => { state.loading = false; state.user = action.payload.user; state.isAuthenticated = true; state.message = action.payload.message; })
+            .addCase(loginUser.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload.user;
+                state.isAuthenticated = true;
+                localStorage.setItem("token", action.payload.token); // <--- TOKEN SAVE KAREIN
+                state.message = action.payload.message;
+            })
             .addCase(fetchAllUsers.fulfilled, (state, action) => {
                 state.loading = false;
                 // Controller "users" key bhej raha hai, usay pakrein
